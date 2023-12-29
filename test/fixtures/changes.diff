@@ -1,0 +1,53 @@
+diff --git added.txt added.txt
+new file mode 100644
+index 0000000..c2e0686
+--- /dev/null
++++ added.txt
+@@ -0,0 +1 @@
++This file has been added and was not present before.
+\ No newline at end of file
+diff --git changed.txt changed.txt
+index 257a2a4..8b48976 100644
+--- changed.txt
++++ changed.txt
+@@ -1,4 +1,5 @@
+-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
++Changes done.
++Lorem ipsum dolor sit amet, this file was changed.
+ Et odio pellentesque diam volutpat commodo sed.
+ Nec ultrices dui sapien eget mi.
+ Tellus cras adipiscing enim eu.
+@@ -6,13 +7,12 @@ Sed blandit libero volutpat sed cras ornare arcu.
+ Maecenas pharetra convallis posuere morbi.
+ Donec massa sapien faucibus et molestie ac feugiat.
+ Felis eget velit aliquet sagittis id consectetur purus.
+-Egestas tellus rutrum tellus pellentesque eu tincidunt.
+-Vitae proin sagittis nisl rhoncus mattis rhoncus urna.
+-Enim blandit volutpat maecenas volutpat blandit aliquam etiam erat velit.
++Massa ultricies mi quis hendrerit dolor magna eget est.
++Pellentesque eu tincidunt tortor aliquam.
++Enim vulputate odio ut enim blandit aliquam etiam erat velit.
+ Diam quis enim lobortis scelerisque fermentum.
+ Lacus viverra vitae congue eu consequat ac.
+-Neque vitae tempus quam pellentesque nec nam aliquam.
+-Malesuada nunc vel risus commodo.
+ Tincidunt id aliquet risus feugiat in ante metus dictum at.
+-Mattis vulputate enim nulla aliquet porttitor.
+-A arcu cursus vitae congue mauris rhoncus aenean.
+\ No newline at end of file
++In fermentum et sollicitudin ac orci phasellus egestas tellus.
++A arcu cursus vitae congue mauris rhoncus aenean.
++New stuff.
+\ No newline at end of file
+diff --git removed.txt removed.txt
+deleted file mode 100644
+index 9584af4..0000000
+--- removed.txt
++++ /dev/null
+@@ -1 +0,0 @@
+-This file will be removed.
+\ No newline at end of file
+diff --git renamed.txt renaming_done.txt
+similarity index 100%
+rename from renamed.txt
+rename to renaming_done.txt
