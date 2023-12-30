@@ -81,6 +81,11 @@ defmodule CoverDiff.Diff do
   end
 
   defp parse_diff([], changes, _line_number) do
-    Map.new(changes, fn {filename, lines} -> {filename, Enum.reverse(lines)} end)
+    changes
+    |> Enum.filter(fn {_filename, lines} ->
+      Enum.any?(lines, fn {_line_number, type, _text} -> type == :add end)
+    end)
+    |> Enum.map(fn {filename, lines} -> {filename, Enum.reverse(lines)} end)
+    |> Map.new()
   end
 end
