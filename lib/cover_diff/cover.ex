@@ -1,5 +1,5 @@
 defmodule CoverDiff.Cover do
-  def compile(diff) when is_list(diff) do
+  def compile_from_diff(diff) when is_map(diff) do
     :cover.stop()
     {:ok, pid} = :cover.start()
 

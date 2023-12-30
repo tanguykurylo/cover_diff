@@ -1,22 +1,32 @@
 defmodule CoverDiff.Diff do
   @moduledoc """
   Parses a diff into a list of additions and context, excluding deletions.
-  For simplicity, the diff must be generated with the --no-prefix option
+  For simplicity, the diff will be generated with the --no-prefix option
   (meaning there will be no "a/" and "b/" prefixes before file paths.)
   """
+
+  @doc """
+  Runs the git diff command and parses the result.
+  """
+  def get_diff(base_branch, context) do
+    diff_command = "git diff -U#{context} #{base_branch}...$(git branch --show-current)"
+    {diff, _exit_code = 0} = System.shell(diff_command)
+    parse(diff)
+  end
 
   @doc """
   Parses a diff in string format into a list of changes per file, taking only added or context lines (not deletions).
   """
   @spec parse(diff :: String.t()) :: [
-          {filename :: String.t(),
-           [
-             {
-               line_number :: integer,
-               type :: :context | :add,
-               text :: String.t()
-             }
-           ]}
+          %{
+            (filename :: String.t()) => [
+              {
+                line_number :: integer,
+                type :: :context | :add,
+                text :: String.t()
+              }
+            ]
+          }
         ]
   def parse(diff) when is_binary(diff) do
     diff
@@ -69,6 +79,6 @@ defmodule CoverDiff.Diff do
   end
 
   defp parse_diff([], changes, _line_number) do
-    Enum.map(changes, fn {filename, lines} -> {filename, Enum.reverse(lines)} end)
+    Map.new(changes, fn {filename, lines} -> {filename, Enum.reverse(lines)} end)
   end
 end
