@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+
+      h3 {
+        font: 1em sans-serif;
+        background-color: WhiteSmoke;
+        padding: 0.5em;
+        margin: 0;
+        margin-bottom: 0.5em;
+        border-bottom: solid DarkGrey;
+        border-radius: 5px 5px 0 0;
+      }
+
+      .file {
+        border: solid DarkGrey;
+        border-radius: 5px;
+        margin-bottom: 1em;
+        padding-bottom: 0.5em;
+      }
+
+      code {
+        line-height: 1.33;
+        white-space: pre-wrap;
+        padding: 2;
+      }
+
+      .uncovered {
+        color: #1f2328;
+        background-color: MistyRose;
+      }
+
+      .line_number{
+        user-select: none;
+      }
+
+      table {
+        border-spacing: 0;
+        color: grey;
+      }
+
+      td {
+        padding: 0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <%= for %{
+      filename: filename,
+      lines: lines,
+      stats: {_covered, stats_text}
+    } <- file_details do %>
+    <div class="file">
+      <h3>
+        <code><%= filename <> " " <> stats_text %></code>
+      </h3>
+      <table>
+        <%= for {line_number, text, cov} <- lines do %>
+          <tr <%= if cov == false do %>
+            class="uncovered"
+            <% end %>
+              >
+              <td><code class="line_number"><%=
+                line_number = if is_integer(line_number), do: Integer.to_string(line_number), else: line_number
+                String.pad_leading(line_number, 6)
+              %></code></td>
+              <td><code><%= if text == "", do: "<br>", else: text %></code></td>
+          </tr>
+          <% end %>
+      </table>
+    </div>
+    <% end %>
+  </body>
+</html>

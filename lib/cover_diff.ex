@@ -51,7 +51,7 @@ defmodule CoverDiff do
   def generate_cover_results(diff, opts) do
     diff
     |> add_coverage()
-    |> CoverDiff.Output.export(opts[:format], opts[:context], opts[:threshold])
+    |> CoverDiff.Output.export(opts)
   end
 
   defp add_coverage(changes) do
