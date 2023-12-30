@@ -56,25 +56,24 @@ defmodule CoverDiff.Output do
           {:bad_coverage, text} -> red_text(text)
         end
 
+      lines = lines(lines, context)
       head = " #{filename} : #{stats}"
 
       desc =
-        lines(lines, context)
+        lines
         |> Enum.map(fn {line_number, text, cov} ->
           text = if cov == false, do: red_text(text), else: text
           String.pad_leading(inspect(line_number), 6) <> "  " <> text
         end)
         |> Enum.join("\n")
 
-      if String.trim(desc) != "" do
+      if lines != [] do
         """
         #{head}
         #{desc}
         """
       else
-        """
-        #{head}
-        """
+        ""
       end
     end)
     |> Mix.shell().info()
