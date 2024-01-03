@@ -9,12 +9,12 @@
         padding: 0.5em;
         margin: 0;
         margin-bottom: 0.5em;
-        border-bottom: solid DarkGrey;
+        border-bottom: 1px solid LightGrey;
         border-radius: 5px 5px 0 0;
       }
 
       .file {
-        border: solid DarkGrey;
+        border: 1px solid LightGrey;
         border-radius: 5px;
         margin-bottom: 1em;
         padding-bottom: 0.5em;
@@ -47,30 +47,32 @@
   </head>
 
   <body>
-    <%= for %{
-      filename: filename,
-      lines: lines,
-      stats: {stats_text, _percentage}
-    } <- file_details do %>
-    <div class="file">
-      <h3>
-        <code><%= filename <> " " <> stats_text %></code>
-      </h3>
-      <table>
-        <%= for {line_number, text, cov} <- lines do %>
-          <tr <%= if cov == false do %>
-            class="uncovered"
+    <div>
+      <%= for %{
+        filename: filename,
+        lines: lines,
+        stats: {stats_text, _percentage}
+      } <- file_details do %>
+      <div class="file">
+        <h3>
+          <code><%= filename <> " " <> stats_text %></code>
+        </h3>
+        <table>
+          <%= for {line_number, text, cov} <- lines do %>
+            <tr <%= if cov == false do %>
+              class="uncovered"
+              <% end %>
+                >
+                <td><code class="line_number"><%=
+                  line_number = if is_integer(line_number), do: Integer.to_string(line_number), else: line_number
+                  String.pad_leading(line_number, 6)
+                %></code></td>
+                <td><code><%= if text == "", do: "<br>", else: text %></code></td>
+            </tr>
             <% end %>
-              >
-              <td><code class="line_number"><%=
-                line_number = if is_integer(line_number), do: Integer.to_string(line_number), else: line_number
-                String.pad_leading(line_number, 6)
-              %></code></td>
-              <td><code><%= if text == "", do: "<br>", else: text %></code></td>
-          </tr>
-          <% end %>
-      </table>
+        </table>
+      </div>
+      <% end %>
     </div>
-    <% end %>
   </body>
 </html>
