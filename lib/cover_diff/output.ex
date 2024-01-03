@@ -3,7 +3,12 @@ defmodule CoverDiff.Output do
 
   def export(coverage, opts) do
     coverage = format_lines(coverage, opts[:context])
-    export(coverage, opts[:format], opts)
+    if opts[:summary] do
+      export(coverage, :console, opts)
+    end
+    if opts[:output] do
+      export(coverage, :html, opts)
+    end
   end
 
   def format_lines(coverage, context) do
@@ -56,18 +61,13 @@ defmodule CoverDiff.Output do
     lines_with_spacers
   end
 
-  def stats(lines, threshold) do
+  def stats(lines) do
     count_cov = Enum.count(lines, fn {_line_number, _text, cov} -> cov == true end)
-
     count_not_cov = Enum.count(lines, fn {_line_number, _text, cov} -> cov == false end)
     total = count_cov + count_not_cov
     stat = percentage(count_cov, count_not_cov)
     stat_text = "#{stat}% [#{count_cov}/#{total}]"
-
-    cond do
-      stat >= threshold -> {:ok, stat_text}
-      stat < threshold -> {:bad_coverage, stat_text}
-    end
+    {stat_text, stat}
   end
 
   defp percentage(0, 0), do: 100.0
@@ -85,23 +85,24 @@ defmodule CoverDiff.Output do
   def export(coverage, :html, opts) do
     file_details =
       for {filename, lines} <- coverage do
-        %{filename: filename, lines: lines, stats: stats(lines, opts[:threshold])}
+        %{filename: filename, lines: lines, stats: stats(lines)}
       end
 
     html = html_template(file_details)
-    path = "tmp/coverage_report.html"
+    path = Path.join(opts[:output], "coverage_report.html")
     path |> Path.dirname() |> File.mkdir_p!()
     File.write!(path, html)
     Mix.shell().info("Wrote coverage report to: #{path}")
   end
 
   def export(coverage, :console, opts) do
+    threshold = opts[:threshold]
     coverage
     |> Enum.map(fn {filename, lines} ->
       stats =
-        case stats(lines, opts[:threshold]) do
-          {:ok, text} -> green_text(text)
-          {:bad_coverage, text} -> red_text(text)
+        case stats(lines) do
+          {text, percentage} when percentage >= threshold -> green_text(text)
+          {text, _percentage} -> red_text(text)
         end
 
       head = " #{filename} : #{stats}"
@@ -124,43 +125,18 @@ defmodule CoverDiff.Output do
       end
     end)
     |> Mix.shell().info()
-  end
 
-  def html_file_details(filename, lines, opts) do
-    {covered, stats_text} = stats(lines, opts[:threshold])
-
-    template = """
-    <div class="file">
-      <p
-        <%= if @covered == :bad_coverage do %>
-        class="uncovered"
-        <% end %>
-      >
-        <%= @filename <> " " <> @stats_text %>
-      </p>
-      <table>
-      <%= for {line_number, text, cov} <- @lines do %>
-        <tr
-          <%= if cov == false do %>
-          class="uncovered"
-          <% end %>
-        >
-          <td><code><%= String.pad_leading(inspect(line_number), 6) %></code></td>
-          <td><code><%= text %></code></td>
-        </tr>
-      <% end %>
-      </table>
-    </div>
-    """
-
-    EEx.eval_string(template,
-      assigns: [
-        filename: filename,
-        lines: lines,
-        covered: covered,
-        stats_text: stats_text
-      ]
-    )
+    total_stats =
+      coverage
+       |> Enum.flat_map(fn  {_filename, lines} -> lines end)
+       |> stats()
+      case total_stats do
+        {text, percentage} when percentage >= threshold ->
+          "Total coverage: #{text}" |> green_text() |> Mix.shell.info()
+        {text, _percentage} ->
+          "Total coverage: #{text}" |> red_text() |> Mix.shell.info()
+          System.at_exit(fn _ -> exit({:shutdown, 3}) end)
+      end
   end
 
   defp red_text(string), do: IO.ANSI.red() <> IO.ANSI.bright() <> string <> IO.ANSI.reset()

@@ -5,6 +5,11 @@ defmodule CoverDiff do
   your `:test_coverage` options:
 
     * `:base_branch` - branch to diff against, defaults to `"master"`
+    * `:context` - how many lines to show around uncovered lines in reports,
+      defaults to 2
+    * `:output`: same as the standard `:output` option from `:test_coverage`,
+      but may be set to `false` to disable html report generation.
+
 
   ## Usage
       def project() do
@@ -23,7 +28,7 @@ defmodule CoverDiff do
   @default_threshold 90
   @default_base_branch "master"
   @default_context_size 2
-  @default_format :console
+  @default_output "cover"
 
   @doc false
   def start(_compile_path, opts) do
@@ -42,8 +47,19 @@ defmodule CoverDiff do
     %{
       base_branch: opts[:base_branch] || @default_base_branch,
       context: opts[:context] || @default_context_size,
-      format: opts[:format] || @default_format,
-      threshold: opts[:threshold] || @default_threshold
+      output: case opts[:output] do
+         false -> false
+         output -> output || @default_output
+      end,
+      summary: case opts[:summary] do
+        false -> false
+        _ -> true
+      end,
+      threshold: case opts[:summary] do
+        false -> nil
+        [threshold: threshold] -> threshold
+        _ -> @default_threshold
+      end
     }
   end
 
