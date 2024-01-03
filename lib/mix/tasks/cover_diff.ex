@@ -1,4 +1,4 @@
-defmodule Mix.Task.CoverDiff do
+defmodule Mix.Tasks.CoverDiff do
   @moduledoc """
   Generates a coverage report for the code in a git diff.
 
@@ -10,12 +10,13 @@ defmodule Mix.Task.CoverDiff do
   Unles specified in the command, the arguments will be fetched from the
   `:test_coverage` configuration, falling back to default values.
   """
-  @requirements ["test --cover --export-coverage <filename>"]
+  @requirements ["compile"]
   @shortdoc "Generates a coverage report for the code in a git diff."
   @switches [
     base_branch: :string,
     context: :integer
   ]
+  @preferred_cli_env :test
 
   use Mix.Task
 

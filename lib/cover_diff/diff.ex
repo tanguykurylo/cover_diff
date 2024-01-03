@@ -12,8 +12,12 @@ defmodule CoverDiff.Diff do
     diff_command =
       "git diff --no-prefix -U#{context} #{base_branch}...$(git branch --show-current)"
 
-    {diff, _exit_code = 0} = System.shell(diff_command)
-    parse(diff)
+    {diff, exit_code} = System.shell(diff_command)
+
+    case exit_code do
+      0 -> {:ok, parse(diff)}
+      _ -> :error
+    end
   end
 
   @doc """

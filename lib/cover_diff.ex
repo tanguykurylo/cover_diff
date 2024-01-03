@@ -40,11 +40,13 @@ defmodule CoverDiff do
       |> Keyword.merge(opts)
       |> format_opts()
 
-    Mix.Task.run("compile")
-    diff = CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context])
-    Cover.compile_from_diff(diff)
-    import_coverage(opts)
-    generate_cover_results(diff, opts)
+    with {:ok, diff} <- CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context]),
+         _result <- Cover.compile_from_diff(diff),
+         :ok <- import_coverage(opts) do
+      generate_cover_results(diff, opts)
+    else
+      _ -> System.at_exit(fn _ -> exit({:shutdown, 3}) end)
+    end
   end
 
   defp import_coverage(opts) do
@@ -56,12 +58,15 @@ defmodule CoverDiff do
     case cover_files do
       [] ->
         Mix.shell().error("Could not find .coverdata file in the directory: " <> opts[:output])
+        :error
 
       entries ->
         for entry <- entries do
           Mix.shell().info("Importing cover results: #{entry}")
           :ok = :cover.import(String.to_charlist(entry))
         end
+
+        :ok
     end
   end
 
