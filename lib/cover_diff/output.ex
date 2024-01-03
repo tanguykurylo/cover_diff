@@ -3,12 +3,12 @@ defmodule CoverDiff.Output do
 
   def export(coverage, opts) do
     coverage = format_lines(coverage, opts[:context])
+
     if opts[:summary] do
       export(coverage, :console, opts)
     end
-    if opts[:output] do
-      export(coverage, :html, opts)
-    end
+
+    export(coverage, :html, opts)
   end
 
   def format_lines(coverage, context) do

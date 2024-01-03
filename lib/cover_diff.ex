@@ -7,7 +7,6 @@ defmodule CoverDiff do
     * `:base_branch` - branch to diff against, defaults to `"master"`
     * `:context` - how many lines to show around uncovered lines in reports,
       defaults to 2
-    * `:output`: same as the standard `:output` option from `:test_coverage`,
       but may be set to `false` to disable html report generation.
 
 
