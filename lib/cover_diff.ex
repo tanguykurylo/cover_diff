@@ -1,26 +1,30 @@
 defmodule CoverDiff do
   @moduledoc """
   Generates a coverage report for the code in a git diff.
+  To use it as a coverage module:
+
+  ```
+    def project() do
+      [
+        ...
+        test_coverage: [tool: CoverDiff, base_branch: "my_base_branch"]
+        ...
+      ]
+    end
+  ```
   The diff will span between your current branch and the specified branch in
   your `:test_coverage` options:
 
     * `:base_branch` - branch to diff against, defaults to `"master"`
     * `:context` - how many lines to show around uncovered lines in reports,
       defaults to 2
-      but may be set to `false` to disable html report generation.
 
+  CoverDiff currently does not work with umbrella applications.
 
-  ## Usage
-      def project() do
-        [
-          ...
-          test_coverage: [tool: CoverDiff, base_branch: "my_base_branch"]
-          ...
-        ]
-      end
+  CoverDiff can also be used as a Mix task without polluting your project
+  configuration. This lets you use the default `:cover` tool during tests and
+  analyze afterwards using CoverDiff. Check Mix.Tasks.CoverDiff for details.
   """
-
-  # use Mix.Task
 
   alias CoverDiff.Cover
 
@@ -28,6 +32,38 @@ defmodule CoverDiff do
   @default_base_branch "master"
   @default_context_size 2
   @default_output "cover"
+
+  def run(opts) do
+    opts =
+      Mix.Project.config()
+      |> Keyword.get(:test_coverage, [])
+      |> Keyword.merge(opts)
+      |> format_opts()
+
+    Mix.Task.run("compile")
+    diff = CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context])
+    Cover.compile_from_diff(diff)
+    import_coverage(opts)
+    generate_cover_results(diff, opts)
+  end
+
+  defp import_coverage(opts) do
+    cover_files =
+      opts[:output]
+      |> Path.join("*.coverdata")
+      |> Path.wildcard()
+
+    case cover_files do
+      [] ->
+        Mix.shell().error("Could not find .coverdata file in the directory: " <> opts[:output])
+
+      entries ->
+        for entry <- entries do
+          Mix.shell().info("Importing cover results: #{entry}")
+          :ok = :cover.import(String.to_charlist(entry))
+        end
+    end
+  end
 
   @doc false
   def start(_compile_path, opts) do
