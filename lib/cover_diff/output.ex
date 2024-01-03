@@ -97,6 +97,7 @@ defmodule CoverDiff.Output do
 
   def export(coverage, :console, opts) do
     threshold = opts[:threshold]
+
     coverage
     |> Enum.map(fn {filename, lines} ->
       stats =
@@ -128,15 +129,17 @@ defmodule CoverDiff.Output do
 
     total_stats =
       coverage
-       |> Enum.flat_map(fn  {_filename, lines} -> lines end)
-       |> stats()
-      case total_stats do
-        {text, percentage} when percentage >= threshold ->
-          "Total coverage: #{text}" |> green_text() |> Mix.shell.info()
-        {text, _percentage} ->
-          "Total coverage: #{text}" |> red_text() |> Mix.shell.info()
-          System.at_exit(fn _ -> exit({:shutdown, 3}) end)
-      end
+      |> Enum.flat_map(fn {_filename, lines} -> lines end)
+      |> stats()
+
+    case total_stats do
+      {text, percentage} when percentage >= threshold ->
+        "Total coverage: #{text}" |> green_text() |> Mix.shell().info()
+
+      {text, _percentage} ->
+        "Total coverage: #{text}" |> red_text() |> Mix.shell().info()
+        System.at_exit(fn _ -> exit({:shutdown, 3}) end)
+    end
   end
 
   defp red_text(string), do: IO.ANSI.red() <> IO.ANSI.bright() <> string <> IO.ANSI.reset()

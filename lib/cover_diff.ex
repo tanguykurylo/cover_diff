@@ -46,19 +46,22 @@ defmodule CoverDiff do
     %{
       base_branch: opts[:base_branch] || @default_base_branch,
       context: opts[:context] || @default_context_size,
-      output: case opts[:output] do
-         false -> false
-         output -> output || @default_output
-      end,
-      summary: case opts[:summary] do
-        false -> false
-        _ -> true
-      end,
-      threshold: case opts[:summary] do
-        false -> nil
-        [threshold: threshold] -> threshold
-        _ -> @default_threshold
-      end
+      output:
+        case opts[:output] do
+          false -> false
+          output -> output || @default_output
+        end,
+      summary:
+        case opts[:summary] do
+          false -> false
+          _ -> true
+        end,
+      threshold:
+        case opts[:summary] do
+          false -> nil
+          [threshold: threshold] -> threshold
+          _ -> @default_threshold
+        end
     }
   end
 
