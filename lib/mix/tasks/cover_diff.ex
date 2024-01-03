@@ -14,7 +14,8 @@ defmodule Mix.Tasks.CoverDiff do
   @shortdoc "Generates a coverage report for the code in a git diff."
   @switches [
     base_branch: :string,
-    context: :integer
+    context: :integer,
+    threshold: :integer
   ]
   @preferred_cli_env :test
 
