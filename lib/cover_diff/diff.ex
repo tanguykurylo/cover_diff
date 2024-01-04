@@ -9,8 +9,7 @@ defmodule CoverDiff.Diff do
   Runs the git diff command and parses the result.
   """
   def get_diff(base_branch, context) do
-    diff_command =
-      "git diff --no-prefix -U#{context} #{base_branch}...HEAD"
+    diff_command = "git diff --no-prefix -U#{context} #{base_branch}...HEAD"
 
     {diff, exit_code} = System.shell(diff_command)
 
