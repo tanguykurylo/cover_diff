@@ -9,7 +9,7 @@ defmodule CoverDiff.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "CoverDiff",
-      source_url: "https://https://github.com/tanguykurylo/cover_diff",
+      source_url: "https://github.com/tanguykurylo/cover_diff",
       docs: [
         main: "CoverDiff",
         extras: ["README.md"]
@@ -18,7 +18,7 @@ defmodule CoverDiff.MixProject do
       package: [
         licenses: ["MIT"],
         links: %{
-          "Github Repository" => "https://https://github.com/tanguykurylo/cover_diff"
+          "Github Repository" => "https://github.com/tanguykurylo/cover_diff"
         }
       ]
     ]
