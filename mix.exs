@@ -8,13 +8,18 @@ defmodule CoverDiff.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-
-      # Docs
       name: "CoverDiff",
       source_url: "https://https://github.com/tanguykurylo/cover_diff",
       docs: [
         main: "CoverDiff",
         extras: ["README.md"]
+      ],
+      description: "Generate coverage reports for the code in a git diff",
+      package: [
+        licenses: ["MIT"],
+        links: %{
+          "Github Repository" => "https://https://github.com/tanguykurylo/cover_diff"
+        }
       ]
     ]
   end
