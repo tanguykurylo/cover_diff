@@ -48,6 +48,9 @@
 
   <body>
     <div>
+      <%= if file_details == [] do %>
+        <code>(No coverage needed)</code>
+      <% end %>
       <%= for %{
         filename: filename,
         lines: lines,
