@@ -20,7 +20,8 @@ defmodule CoverDiff.Diff do
   end
 
   @doc """
-  Parses a diff in string format into a list of changes per file, taking only added or context lines (not deletions).
+  Parses a diff in string format into a list of changes per file,
+  taking only added or context lines (not deletions).
   """
   @spec parse(diff :: String.t()) :: [
           %{

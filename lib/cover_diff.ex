@@ -12,7 +12,7 @@ defmodule CoverDiff do
       ]
     end
   ```
-  The diff will span between your current branch and the specified branch in
+  The diff will span between your current HEAD and the specified branch in
   your `:test_coverage` options:
 
     * `:base_branch` - branch to diff against, defaults to `"master"`
@@ -22,11 +22,12 @@ defmodule CoverDiff do
   CoverDiff currently does not work with umbrella applications.
 
   CoverDiff can also be used as a Mix task without polluting your project
-  configuration. This lets you use the default `:cover` tool during tests and
-  analyze afterwards using CoverDiff. Check Mix.Tasks.CoverDiff for details.
+  configuration. This lets you use any cover tool capable of exporting
+  .coverdata files during tests and analyze them afterwards using CoverDiff.
+  Check Mix.Tasks.CoverDiff for details.
   """
 
-  alias CoverDiff.Cover
+  alias CoverDiff.{Cover, Diff, Output}
 
   @default_threshold 90
   @default_base_branch "master"
@@ -40,47 +41,21 @@ defmodule CoverDiff do
       |> format_opts()
       |> Map.merge(Map.new(opts))
 
-    with {:ok, diff} <- CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context]),
+    with {:ok, diff} <- Diff.get_diff(opts[:base_branch], opts[:context]),
          _result <- Cover.compile_from_diff(diff),
-         :ok <- import_coverage(opts) do
+         :ok <- Cover.import_coverage(opts[:output]) do
       generate_cover_results(diff, opts)
     else
       _ -> System.at_exit(fn _ -> exit({:shutdown, 3}) end)
     end
   end
 
-  defp import_coverage(opts) do
-    cover_files =
-      opts[:output]
-      |> Path.join("*.coverdata")
-      |> Path.wildcard()
-
-    case cover_files do
-      [] ->
-        Mix.shell().error("Could not find .coverdata file in the directory: " <> opts[:output])
-        :error
-
-      entries ->
-        for entry <- entries do
-          Mix.shell().info("Importing cover results: #{entry}")
-          :ok = :cover.import(String.to_charlist(entry))
-        end
-
-        :ok
-    end
-  end
-
   @doc false
   def start(_compile_path, opts) do
-    Mix.shell().info("Cover compiling modules ...")
     opts = format_opts(opts)
-    diff = CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context])
+    diff = Diff.get_diff(opts[:base_branch], opts[:context])
     CoverDiff.Cover.compile_from_diff(diff)
-
-    fn ->
-      Mix.shell().info("\nGenerating cover results ...\n")
-      generate_cover_results(diff, opts)
-    end
+    fn -> generate_cover_results(diff, opts) end
   end
 
   defp format_opts(opts) do
@@ -108,9 +83,11 @@ defmodule CoverDiff do
 
   # If we remove a test without changing the code, coverage is not impacted :(
   def generate_cover_results(diff, opts) do
+    Mix.shell().info("Generating cover results ...")
+
     diff
     |> add_coverage()
-    |> CoverDiff.Output.export(opts)
+    |> Output.export(opts)
   end
 
   defp add_coverage(changes) do
