@@ -89,7 +89,7 @@ defmodule CoverDiff.Output do
       end
 
     html = html_template(file_details)
-    path = Path.join(opts[:output], "coverage_report.html")
+    path = Path.join(opts[:output], "cover_diff_report.html")
     path |> Path.dirname() |> File.mkdir_p!()
     File.write!(path, html)
     Mix.shell().info("Wrote coverage report to: #{path}")
