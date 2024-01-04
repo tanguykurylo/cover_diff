@@ -4,7 +4,7 @@ defmodule Mix.Tasks.CoverDiff do
 
   ```
   mix test --cover --export-coverage <filename>
-  mix cover_diff --base-branch <base_branch> --context <integer>
+  mix cover_diff --base-branch <base_branch> --context <integer> --threshold <percentage>
   ```
 
   Unles specified in the command, the arguments will be fetched from the

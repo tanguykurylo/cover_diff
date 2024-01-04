@@ -37,8 +37,8 @@ defmodule CoverDiff do
     opts =
       Mix.Project.config()
       |> Keyword.get(:test_coverage, [])
-      |> Keyword.merge(opts)
       |> format_opts()
+      |> Map.merge(Map.new(opts))
 
     with {:ok, diff} <- CoverDiff.Diff.get_diff(opts[:base_branch], opts[:context]),
          _result <- Cover.compile_from_diff(diff),
