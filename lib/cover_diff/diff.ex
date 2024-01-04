@@ -10,7 +10,7 @@ defmodule CoverDiff.Diff do
   """
   def get_diff(base_branch, context) do
     diff_command =
-      "git diff --no-prefix -U#{context} #{base_branch}...$(git branch --show-current)"
+      "git diff --no-prefix -U#{context} #{base_branch}...HEAD"
 
     {diff, exit_code} = System.shell(diff_command)
 
