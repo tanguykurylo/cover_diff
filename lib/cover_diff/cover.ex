@@ -20,11 +20,19 @@ defmodule CoverDiff.Cover do
     |> :cover.compile_beam()
   end
 
-  defp modules_from_diff(diff) do
+  def modules_from_diff(diff) do
     diff_files = Enum.map(diff, fn {file, _changes} -> file end)
 
-    Mix.Project.config()[:app]
-    |> Application.spec(:modules)
+    apps =
+      case Mix.Project.config()[:app] do
+        # umbrella project
+        nil -> Mix.Project.apps_paths() |> Map.keys()
+        # normal project
+        app -> [app]
+      end
+
+    apps
+    |> Enum.flat_map(fn app -> Application.spec(app, :modules) end)
     |> Enum.filter(fn module -> module_path(module) in diff_files end)
   end
 
